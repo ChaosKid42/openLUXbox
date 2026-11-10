@@ -247,8 +247,7 @@ void setup() {
   olb_scanlineWordFinal(OLB_LEDS, OLB_FRAME_BOX);
 
   FastLED.setBrightness(OLB_BRIGHTNESS);
-  Lux lux;
-  lux.run();
+  Lux::run();
 }
 
 void loop() {}
