@@ -1,10 +1,4 @@
-// NodeMCU 1.0 (ESP-12E Module)
-// openLUXbox - Startup Animation Library
-// Vorschlag 1: "Scanline Drop"
-// Jedes Wort wird zeilenweise von oben nach unten ein- und ausgeblendet.
-
-#ifndef OLB_INIT_H
-#define OLB_INIT_H
+// openLUXbox
 
 #include <FastLED.h>
 
@@ -12,25 +6,44 @@
 // Konstanten
 // ---------------------------------------------------------------------------
 
-#define OLB_INIT_LED_PIN        2       // GPIO D4
-#define OLB_INIT_NUM_LEDS       256
-#define OLB_INIT_MATRIX_W       16
-#define OLB_INIT_MATRIX_H       16
-#define OLB_INIT_BRIGHTNESS     75      // 20% von 255
+#define OLB_LED_PIN      2
+#define OLB_NUM_LEDS     256
+#define OLB_MATRIX_W     16
+#define OLB_MATRIX_H     16
+#define OLB_BRIGHTNESS   75
+#define OLB_LED_TYPE     WS2812B
+#define OLB_COLOR_ORDER  GRB
 
-#define OLB_INIT_DIM_BRIGHTNESS 30      // ~30% der Ziel-Helligkeit für Flacker-Phase
+#define OLB_INIT_DIM_BRIGHTNESS 30      // ~30/255 der Ziel-Helligkeit für Flacker-Phase
 #define OLB_INIT_SCANLINE_MS    60      // ms pro Zeile beim Einblenden
 #define OLB_INIT_PAUSE_MS       400     // Pause nachdem Wort vollständig
 #define OLB_INIT_FLICKER_MS     80      // ms pro Flacker-Frame
 #define OLB_INIT_FLICKER_COUNT  3       // Anzahl Flackerdurchläufe am Ende von "box"
 #define OLB_INIT_FADEOUT_MS     60      // ms pro Zeile beim Ausblenden
 
+CRGB leds[OLB_NUM_LEDS];
+
+// Pinbelegung der Buttons
+#if defined(ESP8266)
+    #define OLB_BTN_LEFT   D5 // gelb
+    #define OLB_BTN_RIGHT  D2 // grün
+    #define OLB_BTN_UP     D6 // blau
+    #define OLB_BTN_DOWN   D1 // weiß
+#elif defined(ESP32)
+    #define OLB_BTN_LEFT   23 // gelb
+    #define OLB_BTN_RIGHT  19 // grün
+    #define OLB_BTN_UP     18 // blau
+    #define OLB_BTN_DOWN   26 // weiß
+#endif
+
+#include "Lux/lux.h"
+
 // ---------------------------------------------------------------------------
 // Bilddaten: open (magenta), LUX (gelb), box (magenta)
 // Jedes Bild: 16x16, zeilenweise, Index 0 = oben links
 // ---------------------------------------------------------------------------
 
-static const uint32_t OLB_FRAME_OPEN[256] PROGMEM = {
+static const uint32_t OLB_FRAME_OPEN[256] = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
@@ -49,7 +62,7 @@ static const uint32_t OLB_FRAME_OPEN[256] PROGMEM = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000
 };
 
-static const uint32_t OLB_FRAME_LUX[256] PROGMEM = {
+static const uint32_t OLB_FRAME_LUX[256] = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
@@ -68,7 +81,7 @@ static const uint32_t OLB_FRAME_LUX[256] PROGMEM = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000
 };
 
-static const uint32_t OLB_FRAME_BOX[256] PROGMEM = {
+static const uint32_t OLB_FRAME_BOX[256] = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
@@ -94,18 +107,18 @@ static const uint32_t OLB_FRAME_BOX[256] PROGMEM = {
 // Wandelt Serpentinen-Koordinate (x,y) in LED-Index um
 static inline uint16_t olb_xy(uint8_t x, uint8_t y) {
   if (y % 2 == 0) {
-    return y * OLB_INIT_MATRIX_W + (OLB_INIT_MATRIX_W - 1 - x); // gerade: rechts→links
+    return y * OLB_MATRIX_W + (OLB_MATRIX_W - 1 - x); // gerade: rechts→links
   } else {
-    return y * OLB_INIT_MATRIX_W + x;                             // ungerade: links→rechts
+    return y * OLB_MATRIX_W + x;                             // ungerade: links→rechts
   }
 }
 
 
-// Setzt eine komplette Zeile aus einem PROGMEM-Frame mit gegebenem Helligkeitsfaktor (0..255)
+// Setzt eine komplette Zeile aus einem Frame mit gegebenem Helligkeitsfaktor (0..255)
 // bright: 255 = volle Farbe, 128 = halbe Farbe
 static void olb_setRow(CRGB* leds, const uint32_t* frame, uint8_t row, uint8_t bright) {
-  for (uint8_t x = 0; x < OLB_INIT_MATRIX_W; x++) {
-    uint32_t color = pgm_read_dword(&frame[row * OLB_INIT_MATRIX_W + x]);
+  for (uint8_t x = 0; x < OLB_MATRIX_W; x++) {
+    uint32_t color = pgm_read_dword(&frame[row * OLB_MATRIX_W + x]);
     uint8_t r = ((color >> 16) & 0xFF);
     uint8_t g = ((color >>  8) & 0xFF);
     uint8_t b = ((color      ) & 0xFF);
@@ -119,14 +132,14 @@ static void olb_setRow(CRGB* leds, const uint32_t* frame, uint8_t row, uint8_t b
 
 // Löscht eine komplette Zeile
 static void olb_clearRow(CRGB* leds, uint8_t row) {
-  for (uint8_t x = 0; x < OLB_INIT_MATRIX_W; x++) {
+  for (uint8_t x = 0; x < OLB_MATRIX_W; x++) {
     leds[olb_xy(x, row)] = CRGB::Black;
   }
 }
 
 // Löscht das gesamte Display
 static void olb_clearAll(CRGB* leds) {
-  for (uint16_t i = 0; i < OLB_INIT_NUM_LEDS; i++) {
+  for (uint16_t i = 0; i < OLB_NUM_LEDS; i++) {
     leds[i] = CRGB::Black;
   }
 }
@@ -138,14 +151,14 @@ static void olb_clearAll(CRGB* leds) {
 static void olb_scanlineWord(CRGB* leds, const uint32_t* frame) {
 
   // --- Phase 1: Zeilenweise einblenden, erst gedimmt ---
-  for (uint8_t row = 0; row < OLB_INIT_MATRIX_H; row++) {
+  for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
     olb_setRow(leds, frame, row, OLB_INIT_DIM_BRIGHTNESS);
     FastLED.show();
     delay(OLB_INIT_SCANLINE_MS);
   }
 
   // --- Phase 1b: Alle Zeilen auf volle Helligkeit aufhellen ---
-  for (uint8_t row = 0; row < OLB_INIT_MATRIX_H; row++) {
+  for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
     olb_setRow(leds, frame, row, 255);
   }
   FastLED.show();
@@ -154,7 +167,7 @@ static void olb_scanlineWord(CRGB* leds, const uint32_t* frame) {
   delay(OLB_INIT_PAUSE_MS);
 
   // --- Phase 3: Zeilenweise ausblenden ---
-  for (uint8_t row = 0; row < OLB_INIT_MATRIX_H; row++) {
+  for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
     olb_clearRow(leds, row);
     FastLED.show();
     delay(OLB_INIT_FADEOUT_MS);
@@ -165,14 +178,14 @@ static void olb_scanlineWord(CRGB* leds, const uint32_t* frame) {
 static void olb_scanlineWordFinal(CRGB* leds, const uint32_t* frame) {
 
   // --- Phase 1: Zeilenweise einblenden, erst gedimmt ---
-  for (uint8_t row = 0; row < OLB_INIT_MATRIX_H; row++) {
+  for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
     olb_setRow(leds, frame, row, OLB_INIT_DIM_BRIGHTNESS);
     FastLED.show();
     delay(OLB_INIT_SCANLINE_MS);
   }
 
   // --- Phase 1b: Alle Zeilen auf volle Helligkeit ---
-  for (uint8_t row = 0; row < OLB_INIT_MATRIX_H; row++) {
+  for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
     olb_setRow(leds, frame, row, 255);
   }
   FastLED.show();
@@ -187,7 +200,7 @@ static void olb_scanlineWordFinal(CRGB* leds, const uint32_t* frame) {
     FastLED.show();
     delay(OLB_INIT_FLICKER_MS);
     // An
-    for (uint8_t row = 0; row < OLB_INIT_MATRIX_H; row++) {
+    for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
       olb_setRow(leds, frame, row, 255);
     }
     FastLED.show();
@@ -200,29 +213,42 @@ static void olb_scanlineWordFinal(CRGB* leds, const uint32_t* frame) {
   FastLED.show();
 }
 
-// ---------------------------------------------------------------------------
-// Öffentliche API
-// ---------------------------------------------------------------------------
+// ── Echter Zufallsgenerator ───────────────────────────────
+uint32_t getTrueRandom() {
+  uint32_t seed = 0;
+  for (int i = 0; i < 32; i++) {
+    seed = (seed << 1) | (analogRead(A0) & 1);
+    delayMicroseconds(50);
+  }
+  return seed;
+}
 
-/**
- * olb_v1_playIntro(leds)
- *
- * Spielt die komplette Startanimation ab.
- * Voraussetzung: FastLED wurde im Hauptprogramm mit
- *   FastLED.addLeds<WS2812B, OLB_INIT_LED_PIN, GRB>(leds, OLB_INIT_NUM_LEDS);
- *   FastLED.setBrightness(OLB_INIT_BRIGHTNESS);
- * initialisiert.
- *
- * Aufruf: olb_v1_playIntro(leds);
- */
-static void olb_v1_playIntro(CRGB* leds) {
+void setup() {
+  Serial.begin(115200);
+  Serial.println("openLUXbox startet...");
+
+  pinMode(OLB_BTN_LEFT,  INPUT_PULLUP);
+  pinMode(OLB_BTN_RIGHT, INPUT_PULLUP);
+  pinMode(OLB_BTN_DOWN,  INPUT_PULLUP);
+  pinMode(OLB_BTN_UP,    INPUT_PULLUP);
+
+  FastLED.addLeds<WS2812B, OLB_LED_PIN, GRB>(leds, OLB_NUM_LEDS);
+  FastLED.setBrightness(OLB_BRIGHTNESS);
+  FastLED.clear();
+  FastLED.show();
+
+  randomSeed(getTrueRandom());
+
   olb_clearAll(leds);
   FastLED.show();
 
   olb_scanlineWord(leds,      OLB_FRAME_OPEN);
   olb_scanlineWord(leds,      OLB_FRAME_LUX);
   olb_scanlineWordFinal(leds, OLB_FRAME_BOX);
+
+  FastLED.setBrightness(OLB_BRIGHTNESS);
+  Lux lux(leds);
+  lux.run();
 }
 
-#endif // OLB_INIT_H
-
+void loop() {}
