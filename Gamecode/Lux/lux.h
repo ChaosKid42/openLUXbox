@@ -1,13 +1,11 @@
 class Lux
 {
     private:
-        CRGB *leds;
-
         // LED-Matrix Array (16x16)
         int ledMatrix[16][16];
         int matrixRotation = 0; // Rotation des Levels und des Timers 0, 1, 2 oder 3 (je 90°)
 
-        // Geschwindigkeit in LEDs pro Sekunde
+        // Geschwindigkeit in OLB_LEDS pro Sekunde
         const float SPEED_INCREMENT = 0.5;
         float speedX = 0.0;
         float speedY = 0.0;
@@ -473,7 +471,7 @@ class Lux
 
         // Funktion zum Setzen der Matrixfarbe
         void setMatrixColor(CRGB color) {
-            fill_solid(leds, OLB_NUM_LEDS, color);
+            fill_solid(OLB_LEDS, OLB_NUM_LEDS, color);
             FastLED.show();
         }
 
@@ -489,30 +487,30 @@ class Lux
         void waitForAllButtons() {
             while (true) {
                 // Matrix löschen
-                fill_solid(leds, OLB_NUM_LEDS, CRGB::Black);
+                fill_solid(OLB_LEDS, OLB_NUM_LEDS, CRGB::Black);
 
                 if (digitalRead(OLB_BTN_DOWN) == LOW) {
                     // Unterer Rand einfärben
                     for (int x = 0; x < 16; x++) {
-                        leds[getIndexFromMatrix(x, 15)] = CRGB::White;
+                        OLB_LEDS[getIndexFromMatrix(x, 15)] = CRGB::White;
                     }
                 }
                 if (digitalRead(OLB_BTN_RIGHT) == LOW) {
                     // Rechter Rand einfärben
                     for (int y = 0; y < 16; y++) {
-                        leds[getIndexFromMatrix(0, y)] = CRGB::Green;
+                        OLB_LEDS[getIndexFromMatrix(0, y)] = CRGB::Green;
                     }
                 }
                 if (digitalRead(OLB_BTN_LEFT) == LOW) {
                     // Linker Rand einfärben
                     for (int y = 0; y < 16; y++) {
-                        leds[getIndexFromMatrix(15, y)] = CRGB::Yellow;
+                        OLB_LEDS[getIndexFromMatrix(15, y)] = CRGB::Yellow;
                     }
                 }
                 if (digitalRead(OLB_BTN_UP) == LOW) {
                     // Oberer Rand einfärben
                     for (int x = 0; x < 16; x++) {
-                        leds[getIndexFromMatrix(x, 0)] = CRGB::Blue;
+                        OLB_LEDS[getIndexFromMatrix(x, 0)] = CRGB::Blue;
                     }
                 }
 
@@ -534,25 +532,25 @@ class Lux
                 for (int x = 0; x < 16; x++) {
                     int index = getIndexFromMatrix(x, y);
                     if (ledMatrix[x][y] == 0) {
-                        leds[index] = CRGB::Black;
+                        OLB_LEDS[index] = CRGB::Black;
                     } else if (ledMatrix[x][y] == 1) {
                         if ((speedX == 0.0) && (speedY == 0.0)) {
-                            leds[index] = CRGB(0, 70, 0);   // dunkelgrün
+                            OLB_LEDS[index] = CRGB(0, 70, 0);   // dunkelgrün
                         } else {
-                            leds[index] = CRGB(0, 170, 0);  // hellgrün bei Bewegung
+                            OLB_LEDS[index] = CRGB(0, 170, 0);  // hellgrün bei Bewegung
                         }
                     } else if (ledMatrix[x][y] == 2) {
-                        leds[index] = CRGB::Yellow;
+                        OLB_LEDS[index] = CRGB::Yellow;
                     } else if (ledMatrix[x][y] == 3) {
-                        leds[index] = CRGB::Red;
+                        OLB_LEDS[index] = CRGB::Red;
                     } else if (ledMatrix[x][y] == 4) {
-                        leds[index] = CRGB::Orange;
+                        OLB_LEDS[index] = CRGB::Orange;
                     } else if (ledMatrix[x][y] == 5) {
-                        leds[index] = CRGB::Coral;
+                        OLB_LEDS[index] = CRGB::Coral;
                     } else if (ledMatrix[x][y] == 6) {
-                        leds[index] = CRGB::White;
+                        OLB_LEDS[index] = CRGB::White;
                     } else if (ledMatrix[x][y] == 7) {
-                        leds[index] = CRGB::Blue;
+                        OLB_LEDS[index] = CRGB::Blue;
                     }
                 }
             }
@@ -798,11 +796,6 @@ class Lux
         }
 
 public:
-    Lux(CRGB *leds)
-    {
-        this->leds = leds;
-    }
-
     void run(void)
     {
         // Initialisierung des LED-Matrix-Arrays

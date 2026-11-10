@@ -21,7 +21,7 @@
 #define OLB_INIT_FLICKER_COUNT  3       // Anzahl Flackerdurchläufe am Ende von "box"
 #define OLB_INIT_FADEOUT_MS     60      // ms pro Zeile beim Ausblenden
 
-CRGB leds[OLB_NUM_LEDS];
+CRGB OLB_LEDS[OLB_NUM_LEDS];
 
 // Pinbelegung der Buttons
 #if defined(ESP8266)
@@ -116,7 +116,7 @@ static inline uint16_t olb_xy(uint8_t x, uint8_t y) {
 
 // Setzt eine komplette Zeile aus einem Frame mit gegebenem Helligkeitsfaktor (0..255)
 // bright: 255 = volle Farbe, 128 = halbe Farbe
-static void olb_setRow(CRGB* leds, const uint32_t* frame, uint8_t row, uint8_t bright) {
+static void olb_setRow(CRGB* OLB_LEDS, const uint32_t* frame, uint8_t row, uint8_t bright) {
   for (uint8_t x = 0; x < OLB_MATRIX_W; x++) {
     uint32_t color = pgm_read_dword(&frame[row * OLB_MATRIX_W + x]);
     uint8_t r = ((color >> 16) & 0xFF);
@@ -126,21 +126,21 @@ static void olb_setRow(CRGB* leds, const uint32_t* frame, uint8_t row, uint8_t b
     r = (uint8_t)((uint16_t)r * bright / 255);
     g = (uint8_t)((uint16_t)g * bright / 255);
     b = (uint8_t)((uint16_t)b * bright / 255);
-    leds[olb_xy(x, row)] = CRGB(r, g, b);
+    OLB_LEDS[olb_xy(x, row)] = CRGB(r, g, b);
   }
 }
 
 // Löscht eine komplette Zeile
-static void olb_clearRow(CRGB* leds, uint8_t row) {
+static void olb_clearRow(CRGB* OLB_LEDS, uint8_t row) {
   for (uint8_t x = 0; x < OLB_MATRIX_W; x++) {
-    leds[olb_xy(x, row)] = CRGB::Black;
+    OLB_LEDS[olb_xy(x, row)] = CRGB::Black;
   }
 }
 
 // Löscht das gesamte Display
-static void olb_clearAll(CRGB* leds) {
+static void olb_clearAll(CRGB* OLB_LEDS) {
   for (uint16_t i = 0; i < OLB_NUM_LEDS; i++) {
-    leds[i] = CRGB::Black;
+    OLB_LEDS[i] = CRGB::Black;
   }
 }
 
@@ -148,18 +148,18 @@ static void olb_clearAll(CRGB* leds) {
 // 1. Zeilenweise einblenden: erst gedimmt, dann voll hell
 // 2. Pause
 // 3. Zeilenweise ausblenden (von oben nach unten)
-static void olb_scanlineWord(CRGB* leds, const uint32_t* frame) {
+static void olb_scanlineWord(CRGB* OLB_LEDS, const uint32_t* frame) {
 
   // --- Phase 1: Zeilenweise einblenden, erst gedimmt ---
   for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
-    olb_setRow(leds, frame, row, OLB_INIT_DIM_BRIGHTNESS);
+    olb_setRow(OLB_LEDS, frame, row, OLB_INIT_DIM_BRIGHTNESS);
     FastLED.show();
     delay(OLB_INIT_SCANLINE_MS);
   }
 
   // --- Phase 1b: Alle Zeilen auf volle Helligkeit aufhellen ---
   for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
-    olb_setRow(leds, frame, row, 255);
+    olb_setRow(OLB_LEDS, frame, row, 255);
   }
   FastLED.show();
 
@@ -168,25 +168,25 @@ static void olb_scanlineWord(CRGB* leds, const uint32_t* frame) {
 
   // --- Phase 3: Zeilenweise ausblenden ---
   for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
-    olb_clearRow(leds, row);
+    olb_clearRow(OLB_LEDS, row);
     FastLED.show();
     delay(OLB_INIT_FADEOUT_MS);
   }
 }
 
 // Zeigt das letzte Wort ("box") mit Scanline-Drop + Flackern am Ende statt Ausblenden
-static void olb_scanlineWordFinal(CRGB* leds, const uint32_t* frame) {
+static void olb_scanlineWordFinal(CRGB* OLB_LEDS, const uint32_t* frame) {
 
   // --- Phase 1: Zeilenweise einblenden, erst gedimmt ---
   for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
-    olb_setRow(leds, frame, row, OLB_INIT_DIM_BRIGHTNESS);
+    olb_setRow(OLB_LEDS, frame, row, OLB_INIT_DIM_BRIGHTNESS);
     FastLED.show();
     delay(OLB_INIT_SCANLINE_MS);
   }
 
   // --- Phase 1b: Alle Zeilen auf volle Helligkeit ---
   for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
-    olb_setRow(leds, frame, row, 255);
+    olb_setRow(OLB_LEDS, frame, row, 255);
   }
   FastLED.show();
 
@@ -196,12 +196,12 @@ static void olb_scanlineWordFinal(CRGB* leds, const uint32_t* frame) {
   // --- Phase 3: Flackern (An/Aus) ---
   for (uint8_t i = 0; i < OLB_INIT_FLICKER_COUNT; i++) {
     // Aus
-    olb_clearAll(leds);
+    olb_clearAll(OLB_LEDS);
     FastLED.show();
     delay(OLB_INIT_FLICKER_MS);
     // An
     for (uint8_t row = 0; row < OLB_MATRIX_H; row++) {
-      olb_setRow(leds, frame, row, 255);
+      olb_setRow(OLB_LEDS, frame, row, 255);
     }
     FastLED.show();
     delay(OLB_INIT_FLICKER_MS);
@@ -209,7 +209,7 @@ static void olb_scanlineWordFinal(CRGB* leds, const uint32_t* frame) {
 
   // --- Phase 4: Finales Ausblenden ---
   delay(OLB_INIT_PAUSE_MS);
-  olb_clearAll(leds);
+  olb_clearAll(OLB_LEDS);
   FastLED.show();
 }
 
@@ -232,22 +232,22 @@ void setup() {
   pinMode(OLB_BTN_DOWN,  INPUT_PULLUP);
   pinMode(OLB_BTN_UP,    INPUT_PULLUP);
 
-  FastLED.addLeds<WS2812B, OLB_LED_PIN, GRB>(leds, OLB_NUM_LEDS);
+  FastLED.addLeds<WS2812B, OLB_LED_PIN, GRB>(OLB_LEDS, OLB_NUM_LEDS);
   FastLED.setBrightness(OLB_BRIGHTNESS);
   FastLED.clear();
   FastLED.show();
 
   randomSeed(getTrueRandom());
 
-  olb_clearAll(leds);
+  olb_clearAll(OLB_LEDS);
   FastLED.show();
 
-  olb_scanlineWord(leds,      OLB_FRAME_OPEN);
-  olb_scanlineWord(leds,      OLB_FRAME_LUX);
-  olb_scanlineWordFinal(leds, OLB_FRAME_BOX);
+  olb_scanlineWord(OLB_LEDS,      OLB_FRAME_OPEN);
+  olb_scanlineWord(OLB_LEDS,      OLB_FRAME_LUX);
+  olb_scanlineWordFinal(OLB_LEDS, OLB_FRAME_BOX);
 
   FastLED.setBrightness(OLB_BRIGHTNESS);
-  Lux lux(leds);
+  Lux lux;
   lux.run();
 }
 
