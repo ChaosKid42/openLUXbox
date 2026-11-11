@@ -14,12 +14,14 @@
 #define OLB_LED_TYPE     WS2812B
 #define OLB_COLOR_ORDER  GRB
 
-#define OLB_INIT_DIM_BRIGHTNESS 30      // ~30/255 der Ziel-Helligkeit für Flacker-Phase
-#define OLB_INIT_SCANLINE_MS    60      // ms pro Zeile beim Einblenden
-#define OLB_INIT_PAUSE_MS       400     // Pause nachdem Wort vollständig
-#define OLB_INIT_FLICKER_MS     80      // ms pro Flacker-Frame
-#define OLB_INIT_FLICKER_COUNT  3       // Anzahl Flackerdurchläufe am Ende von "box"
-#define OLB_INIT_FADEOUT_MS     60      // ms pro Zeile beim Ausblenden
+#define OLB_INIT_DIM_BRIGHTNESS  30      // ~30/255 der Ziel-Helligkeit für Flacker-Phase
+#define OLB_INIT_SCANLINE_MS     60      // ms pro Zeile beim Einblenden
+#define OLB_INIT_PAUSE_MS        400     // Pause nachdem Wort vollständig
+#define OLB_INIT_FLICKER_MS      80      // ms pro Flacker-Frame
+#define OLB_INIT_FLICKER_COUNT   3       // Anzahl Flackerdurchläufe am Ende von "box"
+#define OLB_INIT_FADEOUT_MS      60      // ms pro Zeile beim Ausblenden
+#define OLB_INIT_DEBOUNCE_DELAY  50
+#define OLB_INIT_NO_GAMES         8
 
 CRGB OLB_LEDS[OLB_NUM_LEDS];
 
@@ -43,7 +45,7 @@ CRGB OLB_LEDS[OLB_NUM_LEDS];
 // Jedes Bild: 16x16, zeilenweise, Index 0 = oben links
 // ---------------------------------------------------------------------------
 
-static const uint32_t OLB_FRAME_OPEN[256] = {
+static const uint32_t OLB_FRAME_OPEN[256] PROGMEM = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
@@ -62,7 +64,7 @@ static const uint32_t OLB_FRAME_OPEN[256] = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000
 };
 
-static const uint32_t OLB_FRAME_LUX[256] = {
+static const uint32_t OLB_FRAME_LUX[256] PROGMEM = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
@@ -81,7 +83,7 @@ static const uint32_t OLB_FRAME_LUX[256] = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000
 };
 
-static const uint32_t OLB_FRAME_BOX[256] = {
+static const uint32_t OLB_FRAME_BOX[256] PROGMEM = {
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
   0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,0x000000,
@@ -223,6 +225,62 @@ uint32_t getTrueRandom() {
   return seed;
 }
 
+unsigned int gameMenu() {
+    int lastBtnLeft = digitalRead(OLB_BTN_LEFT);
+    int lastBtnRight = digitalRead(OLB_BTN_RIGHT);
+    int lastBtnDown = digitalRead(OLB_BTN_DOWN);
+
+    unsigned long lastDebounceTimeLeft = 0;
+    unsigned long lastDebounceTimeRight = 0;
+    unsigned long lastDebounceTimeDown = 0;
+
+    int game = 0;
+
+
+    while (true) {
+        unsigned long currentMillis = millis();
+        int btnDown = digitalRead(OLB_BTN_DOWN);
+        int btnLeft = digitalRead(OLB_BTN_LEFT);
+        int btnRight = digitalRead(OLB_BTN_RIGHT);
+        int select = 0;
+
+        if (btnDown == LOW && lastBtnDown == HIGH && (currentMillis - lastDebounceTimeDown > OLB_INIT_DEBOUNCE_DELAY)) {
+            lastDebounceTimeDown = currentMillis;
+            return game;
+        }
+
+        if (btnLeft == LOW && lastBtnLeft == HIGH && (currentMillis - lastDebounceTimeLeft > OLB_INIT_DEBOUNCE_DELAY)) {
+            lastDebounceTimeLeft = currentMillis;
+            select = -1;
+        }
+
+        if (btnRight == LOW && lastBtnRight == HIGH && (currentMillis - lastDebounceTimeRight > OLB_INIT_DEBOUNCE_DELAY)) {
+            lastDebounceTimeRight = currentMillis;
+            select = 1;
+        }
+
+        game += select;
+        if (game >= OLB_INIT_NO_GAMES) {
+            game = 0;
+        }
+        if (game < 0) {
+            game = OLB_INIT_NO_GAMES-1;
+        }
+
+        FastLED.clear();
+        for (int i = 0; i < game+1; i++) {
+            OLB_LEDS[i] = CRGB(255, 255, 255);
+        }
+        FastLED.show();
+
+        lastBtnDown = btnDown;
+        lastBtnLeft = btnLeft;
+        lastBtnRight = btnRight;
+
+        delay(20);
+    }
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println("openLUXbox startet...");
@@ -233,21 +291,26 @@ void setup() {
   pinMode(OLB_BTN_UP,    INPUT_PULLUP);
 
   FastLED.addLeds<WS2812B, OLB_LED_PIN, GRB>(OLB_LEDS, OLB_NUM_LEDS);
-  FastLED.setBrightness(OLB_BRIGHTNESS);
-  FastLED.clear();
-  FastLED.show();
-
-  randomSeed(getTrueRandom());
-
-  olb_clearAll(OLB_LEDS);
-  FastLED.show();
-
-  olb_scanlineWord(OLB_LEDS,      OLB_FRAME_OPEN);
-  olb_scanlineWord(OLB_LEDS,      OLB_FRAME_LUX);
-  olb_scanlineWordFinal(OLB_LEDS, OLB_FRAME_BOX);
-
-  FastLED.setBrightness(OLB_BRIGHTNESS);
-  Lux::run();
 }
 
-void loop() {}
+void loop() {
+    FastLED.setBrightness(OLB_BRIGHTNESS);
+    FastLED.clear();
+    FastLED.show();
+    randomSeed(getTrueRandom());
+    olb_clearAll(OLB_LEDS);
+    FastLED.show();
+
+    olb_scanlineWord(OLB_LEDS,      OLB_FRAME_OPEN);
+    olb_scanlineWord(OLB_LEDS,      OLB_FRAME_LUX);
+    olb_scanlineWordFinal(OLB_LEDS, OLB_FRAME_BOX);
+
+    FastLED.setBrightness(OLB_BRIGHTNESS);
+    unsigned int game = gameMenu();
+    delay(100);
+    switch (game) {
+        case 0:
+            Lux::run();
+            break;
+    }
+}
