@@ -27,17 +27,20 @@ CRGB OLB_LEDS[OLB_NUM_LEDS];
 
 // Pinbelegung der Buttons
 #if defined(ESP8266)
-    #define OLB_BTN_LEFT   D5 // gelb
-    #define OLB_BTN_RIGHT  D2 // grün
-    #define OLB_BTN_UP     D6 // blau
-    #define OLB_BTN_DOWN   D1 // weiß
+    #define OLB_BTN_LEFT     D5 // gelb
+    #define OLB_BTN_RIGHT    D2 // grün
+    #define OLB_BTN_UP       D6 // blau
+    #define OLB_BTN_DOWN     D1 // weiß
+    #define OLB_INIT_SEEDPIN D3
 #elif defined(ESP32)
-    #define OLB_BTN_LEFT   23 // gelb
-    #define OLB_BTN_RIGHT  19 // grün
-    #define OLB_BTN_UP     18 // blau
-    #define OLB_BTN_DOWN   26 // weiß
+    #define OLB_BTN_LEFT     23 // gelb
+    #define OLB_BTN_RIGHT    19 // grün
+    #define OLB_BTN_UP       18 // blau
+    #define OLB_BTN_DOWN     26 // weiß
+    #define OLB_INIT_SEEDPIN 33
 #endif
 
+#include "4Pong/4Pong.h"
 #include "Lux/lux.h"
 
 // ---------------------------------------------------------------------------
@@ -219,8 +222,11 @@ static void olb_scanlineWordFinal(CRGB* OLB_LEDS, const uint32_t* frame) {
 uint32_t getTrueRandom() {
   uint32_t seed = 0;
   for (int i = 0; i < 32; i++) {
-    seed = (seed << 1) | (analogRead(A0) & 1);
-    delayMicroseconds(50);
+    seed ^= (uint32_t)analogRead(A0) << (i % 16);
+    delay(1);
+  }
+  for (int i = 0; i < 16; i++) {
+    seed ^= (uint32_t)digitalRead(OLB_INIT_SEEDPIN) << i;
   }
   return seed;
 }
@@ -307,9 +313,12 @@ void loop() {
 
     FastLED.setBrightness(OLB_BRIGHTNESS);
     unsigned int game = gameMenu();
-    delay(100);
+    delay(500);
     switch (game) {
         case 0:
+            FourPong::run();
+            break;
+        case 3:
             Lux::run();
             break;
     }
