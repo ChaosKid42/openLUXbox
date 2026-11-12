@@ -796,6 +796,7 @@ namespace Lux
 
     void run(void)
     {
+        FastLED.setBrightness(50);
         // Initialisierung des LED-Matrix-Arrays
         memset(ledMatrix, 0, sizeof(ledMatrix));
         setupScreen();

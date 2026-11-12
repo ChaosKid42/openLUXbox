@@ -135,6 +135,7 @@ namespace FourPong
     };
 
     void run() {
+      FastLED.setBrightness(51);
       // Startscreen zeichnen
       clearMatrix();
       FastLED.show();

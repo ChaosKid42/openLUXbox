@@ -10,10 +10,10 @@
 #define OLB_NUM_LEDS     256
 #define OLB_MATRIX_W     16
 #define OLB_MATRIX_H     16
-#define OLB_BRIGHTNESS   75
 #define OLB_LED_TYPE     WS2812B
 #define OLB_COLOR_ORDER  GRB
 
+#define OLB_INIT_BRIGHTNESS      75
 #define OLB_INIT_DIM_BRIGHTNESS  30      // ~30/255 der Ziel-Helligkeit für Flacker-Phase
 #define OLB_INIT_SCANLINE_MS     60      // ms pro Zeile beim Einblenden
 #define OLB_INIT_PAUSE_MS        400     // Pause nachdem Wort vollständig
@@ -41,6 +41,7 @@ CRGB OLB_LEDS[OLB_NUM_LEDS];
 #endif
 
 #include "4Pong/4Pong.h"
+#include "Frog/frog.h"
 #include "Lux/lux.h"
 
 // ---------------------------------------------------------------------------
@@ -300,7 +301,7 @@ void setup() {
 }
 
 void loop() {
-    FastLED.setBrightness(OLB_BRIGHTNESS);
+    FastLED.setBrightness(OLB_INIT_BRIGHTNESS);
     FastLED.clear();
     FastLED.show();
     randomSeed(getTrueRandom());
@@ -311,12 +312,15 @@ void loop() {
     olb_scanlineWord(OLB_LEDS,      OLB_FRAME_LUX);
     olb_scanlineWordFinal(OLB_LEDS, OLB_FRAME_BOX);
 
-    FastLED.setBrightness(OLB_BRIGHTNESS);
+    FastLED.setBrightness(OLB_INIT_BRIGHTNESS);
     unsigned int game = gameMenu();
     delay(500);
     switch (game) {
         case 0:
             FourPong::run();
+            break;
+        case 1:
+            Frog::run();
             break;
         case 3:
             Lux::run();
