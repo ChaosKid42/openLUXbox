@@ -21,7 +21,7 @@
 #define OLB_INIT_FLICKER_COUNT   3       // Anzahl Flackerdurchläufe am Ende von "box"
 #define OLB_INIT_FADEOUT_MS      60      // ms pro Zeile beim Ausblenden
 #define OLB_INIT_DEBOUNCE_DELAY  50
-#define OLB_INIT_NO_GAMES         8
+#define OLB_INIT_NO_GAMES        4
 
 CRGB OLB_LEDS[OLB_NUM_LEDS];
 
@@ -42,6 +42,7 @@ CRGB OLB_LEDS[OLB_NUM_LEDS];
 
 #include "4Pong/4Pong.h"
 #include "Frog/frog.h"
+#include "Kreuzfeuer/kreuzfeuer.h"
 #include "Lux/lux.h"
 
 // ---------------------------------------------------------------------------
@@ -321,6 +322,9 @@ void loop() {
             break;
         case 1:
             Frog::run();
+            break;
+        case 2:
+            Kreuzfeuer::run();
             break;
         case 3:
             Lux::run();

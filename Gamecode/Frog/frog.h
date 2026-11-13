@@ -233,7 +233,7 @@ namespace Frog
             gameStarted = true;
             initGame();
             }
-            return;
+            continue;
         }
 
         if (waitForRestart) {
@@ -242,14 +242,14 @@ namespace Frog
             waitForRestart = false;
             showStartScreen();
             }
-            return;
+            continue;
         }
 
         // Frosch bewegen
         if (btnU.pressed && frogY > ROW_GOAL)    frogY--;
         if (btnD.pressed && frogY < ROW_START)   frogY++;
-        if (btnL.pressed && frogX > 0)           frogX--;
-        if (btnR.pressed && frogX < OLB_MATRIX_W-1)  frogX++;
+        if (btnR.pressed && frogX > 0)           frogX--;
+        if (btnL.pressed && frogX < OLB_MATRIX_W-1)  frogX++;
 
         // Takt: Spuren + Log-Drift
         unsigned long now = millis();
@@ -273,7 +273,7 @@ namespace Frog
         }
 
         checkCollision();
-        if (waitForRestart) return;
+        if (waitForRestart) continue;
 
         checkFireflyCollision();
         drawFrame();
