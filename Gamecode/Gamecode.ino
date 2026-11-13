@@ -21,7 +21,7 @@
 #define OLB_INIT_FLICKER_COUNT   3       // Anzahl Flackerdurchläufe am Ende von "box"
 #define OLB_INIT_FADEOUT_MS      60      // ms pro Zeile beim Ausblenden
 #define OLB_INIT_DEBOUNCE_DELAY  50
-#define OLB_INIT_NO_GAMES        4
+#define OLB_INIT_NO_GAMES        5
 
 CRGB OLB_LEDS[OLB_NUM_LEDS];
 
@@ -44,6 +44,7 @@ CRGB OLB_LEDS[OLB_NUM_LEDS];
 #include "Frog/frog.h"
 #include "Kreuzfeuer/kreuzfeuer.h"
 #include "Lux/lux.h"
+#include "Nano_Hexagon/nano_hexagon.h"
 
 // ---------------------------------------------------------------------------
 // Bilddaten: open (magenta), LUX (gelb), box (magenta)
@@ -328,6 +329,9 @@ void loop() {
             break;
         case 3:
             Lux::run();
+            break;
+        case 4:
+            Nanohexagon::run();
             break;
     }
 }
