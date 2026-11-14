@@ -12,8 +12,6 @@ namespace FourPong
 
     const float GAMEOVER_SPEED = 12;
 
-    const int DEBOUNCE_MS = 30;
-
     // Farben
     const CRGB COL_BLACK = CRGB(0,0,0);
     const CRGB COL_BALL = CRGB(180,0,255);
@@ -135,7 +133,6 @@ namespace FourPong
     };
 
     void run() {
-      FastLED.setBrightness(51);
       // Startscreen zeichnen
       clearMatrix();
       FastLED.show();
@@ -302,7 +299,7 @@ namespace FourPong
         b->pressed = false;
         bool current = digitalRead(b->pin);
         if (current == LOW && b->lastState == HIGH) {
-          if (now - b->lastDebounce > DEBOUNCE_MS) {
+          if (now - b->lastDebounce > OLB_DEBOUNCE_MS) {
             b->pressed = true;
             b->lastDebounce = now;
             Serial.print("[BTN] Taste gedrückt: Index=");

@@ -4,7 +4,6 @@ namespace Shining
     // 1. DEFINES & KONFIGURATION
     // =============================================================================
 
-    const unsigned int DEBOUNCE_MS = 30;
     const unsigned int NUM_BUTTONS = 4;
 
     // Richtungs- & Farb-Indizes
@@ -97,7 +96,7 @@ namespace Shining
     // 4. FUNKTIONSPROTOTYPEN
     // =============================================================================
 
-    void initHardware();
+    void initButtons();
     void resetGame();
     void respawnCenterCluster();
     void triggerGameOverExplosion();
@@ -186,7 +185,7 @@ namespace Shining
     }
 
     void run() {
-      initHardware();
+      initButtons();
       currentState = STATE_TITLE;
       while (true) {
           uint32_t currentMillis = millis();
@@ -231,14 +230,12 @@ namespace Shining
     // 7. HARDWARE & KOORDINATENMAPPING
     // =============================================================================
 
-    void initHardware() {
+    void initButtons() {
       for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
         buttons[i].lastState = digitalRead(buttons[i].pin);
         buttons[i].pressedEvent = false;
         buttons[i].lastDebounceTime = 0;
       }
-      FastLED.setBrightness(51);
-      FastLED.clear(true);
     }
 
     void updateButtons() {
@@ -247,7 +244,7 @@ namespace Shining
         buttons[i].pressedEvent = false;
         bool reading = digitalRead(buttons[i].pin);
         if (reading != buttons[i].lastState) {
-          if ((now - buttons[i].lastDebounceTime) > DEBOUNCE_MS) {
+          if ((now - buttons[i].lastDebounceTime) > OLB_DEBOUNCE_MS) {
             if (reading == LOW) { // Flankenwechsel HIGH -> LOW
               buttons[i].pressedEvent = true;
             }

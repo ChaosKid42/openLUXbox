@@ -4,8 +4,6 @@ namespace Nanohexagon
     const CRGB COLOR_BAR = CRGB::Red;
     const CRGB COLOR_SCORE = CRGB(0, 40, 0);   // Dunkelgrün
 
-    const unsigned int DEBOUNCE_TIME = 30;
-
     const float START_SPEED = 1.0;
     const float SPEED_STEP = 0.5;
     const unsigned int SPEED_INTERVAL = 5000;   // alle 5s
@@ -301,7 +299,7 @@ namespace Nanohexagon
         b.lastRaw = raw;
       }
 
-      if (millis() - b.lastChange > DEBOUNCE_TIME) {
+      if (millis() - b.lastChange > OLB_DEBOUNCE_MS) {
         if (raw != b.stable) {
           b.stable = raw;
           if (b.stable == LOW) return true;

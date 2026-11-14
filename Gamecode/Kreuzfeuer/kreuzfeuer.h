@@ -10,8 +10,6 @@ namespace Kreuzfeuer {
     const unsigned int OLB_SEA_MAX = 14;
     const unsigned int OLB_SEA_SIZE = 14;
 
-    const unsigned int OLB_DEBOUNCE_MS = 30;
-
     /* --- Geschuetze --- */
     const unsigned int OLB_CANNON_STEP_MS_BASE = 200;
     const unsigned int OLB_CANNON_STEP_DEC = 20;
@@ -300,12 +298,7 @@ namespace Kreuzfeuer {
        RUN
        --------------------------------------------------------------------------- */
     void run() {
-      Serial.begin(115200);
       Serial.println(F("[BOOT] openLUXbox KREUZFEUER v1.0"));
-
-      FastLED.setBrightness(51);
-      FastLED.clear();
-      FastLED.show();
 
       olb_initCannons();
       olb_resetBoard();

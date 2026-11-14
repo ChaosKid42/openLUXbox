@@ -796,7 +796,6 @@ namespace Lux
 
     void run(void)
     {
-        FastLED.setBrightness(50);
         // Initialisierung des LED-Matrix-Arrays
         memset(ledMatrix, 0, sizeof(ledMatrix));
         setupScreen();
@@ -830,7 +829,6 @@ namespace Lux
             unsigned long lastDebounceTime2 = 0;
             unsigned long lastDebounceTime3 = 0;
             unsigned long lastDebounceTime4 = 0;
-            const unsigned long DEBOUNCE_DELAY = 30; // 30 ms Sperrzeit laut TSD
 
             while (oldScore == score && oldLives == lives) {
                 unsigned long currentMillis = millis();
@@ -841,19 +839,19 @@ namespace Lux
                 int btn4 = digitalRead(OLB_BTN_DOWN);
 
                 // Überprüfen auf Tastendruck (Flanke HIGH -> LOW) mit Entprell-Sperrzeit
-                if (btn1 == LOW && lastBtn1 == HIGH && (currentMillis - lastDebounceTime1 > DEBOUNCE_DELAY)) {
+                if (btn1 == LOW && lastBtn1 == HIGH && (currentMillis - lastDebounceTime1 > OLB_DEBOUNCE_MS)) {
                     speedX -= SPEED_INCREMENT;
                     lastDebounceTime1 = currentMillis;
                 }
-                if (btn2 == LOW && lastBtn2 == HIGH && (currentMillis - lastDebounceTime2 > DEBOUNCE_DELAY)) {
+                if (btn2 == LOW && lastBtn2 == HIGH && (currentMillis - lastDebounceTime2 > OLB_DEBOUNCE_MS)) {
                     speedX += SPEED_INCREMENT;
                     lastDebounceTime2 = currentMillis;
                 }
-                if (btn3 == LOW && lastBtn3 == HIGH && (currentMillis - lastDebounceTime3 > DEBOUNCE_DELAY)) {
+                if (btn3 == LOW && lastBtn3 == HIGH && (currentMillis - lastDebounceTime3 > OLB_DEBOUNCE_MS)) {
                     speedY += SPEED_INCREMENT;
                     lastDebounceTime3 = currentMillis;
                 }
-                if (btn4 == LOW && lastBtn4 == HIGH && (currentMillis - lastDebounceTime4 > DEBOUNCE_DELAY)) {
+                if (btn4 == LOW && lastBtn4 == HIGH && (currentMillis - lastDebounceTime4 > OLB_DEBOUNCE_MS)) {
                     speedY -= SPEED_INCREMENT;
                     lastDebounceTime4 = currentMillis;
                 }

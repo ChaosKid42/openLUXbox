@@ -6,22 +6,23 @@
 // Konstanten
 // ---------------------------------------------------------------------------
 
-#define OLB_LED_PIN      2
-#define OLB_NUM_LEDS     256
-#define OLB_MATRIX_W     16
-#define OLB_MATRIX_H     16
-#define OLB_LED_TYPE     WS2812B
-#define OLB_COLOR_ORDER  GRB
+#define OLB_LED_PIN         2
+#define OLB_NUM_LEDS        256
+#define OLB_MATRIX_W        16
+#define OLB_MATRIX_H        16
+#define OLB_LED_TYPE        WS2812B
+#define OLB_COLOR_ORDER     GRB
+#define OLB_GAME_BRIGHTNESS 50
+#define OLB_DEBOUNCE_MS     30
 
 #define OLB_INIT_BRIGHTNESS      75
-#define OLB_INIT_DIM_BRIGHTNESS  30      // ~30/255 der Ziel-Helligkeit für Flacker-Phase
+#define OLB_INIT_DIM_BRIGHTNESS  30
 #define OLB_INIT_SCANLINE_MS     60      // ms pro Zeile beim Einblenden
 #define OLB_INIT_PAUSE_MS        400     // Pause nachdem Wort vollständig
 #define OLB_INIT_FLICKER_MS      80      // ms pro Flacker-Frame
 #define OLB_INIT_FLICKER_COUNT   3       // Anzahl Flackerdurchläufe am Ende von "box"
 #define OLB_INIT_FADEOUT_MS      60      // ms pro Zeile beim Ausblenden
-#define OLB_INIT_DEBOUNCE_DELAY  50
-#define OLB_INIT_NO_GAMES        6
+#define OLB_INIT_NO_GAMES        7
 
 CRGB OLB_LEDS[OLB_NUM_LEDS];
 
@@ -247,17 +248,17 @@ unsigned int gameMenu() {
         int btnRight = digitalRead(OLB_BTN_RIGHT);
         int select = 0;
 
-        if (btnDown == LOW && lastBtnDown == HIGH && (currentMillis - lastDebounceTimeDown > OLB_INIT_DEBOUNCE_DELAY)) {
+        if (btnDown == LOW && lastBtnDown == HIGH && (currentMillis - lastDebounceTimeDown > OLB_DEBOUNCE_MS)) {
             lastDebounceTimeDown = currentMillis;
             return game;
         }
 
-        if (btnLeft == LOW && lastBtnLeft == HIGH && (currentMillis - lastDebounceTimeLeft > OLB_INIT_DEBOUNCE_DELAY)) {
+        if (btnLeft == LOW && lastBtnLeft == HIGH && (currentMillis - lastDebounceTimeLeft > OLB_DEBOUNCE_MS)) {
             lastDebounceTimeLeft = currentMillis;
             select = -1;
         }
 
-        if (btnRight == LOW && lastBtnRight == HIGH && (currentMillis - lastDebounceTimeRight > OLB_INIT_DEBOUNCE_DELAY)) {
+        if (btnRight == LOW && lastBtnRight == HIGH && (currentMillis - lastDebounceTimeRight > OLB_DEBOUNCE_MS)) {
             lastDebounceTimeRight = currentMillis;
             select = 1;
         }
@@ -302,22 +303,25 @@ void setup() {
 #include "Lux/lux.h"
 #include "Nano_Hexagon/nano_hexagon.h"
 #include "Shining/shining.h"
+#include "Snake/snake.h"
 
 void loop() {
     FastLED.setBrightness(OLB_INIT_BRIGHTNESS);
     FastLED.clear();
     FastLED.show();
     randomSeed(getTrueRandom());
-    olb_clearAll(OLB_LEDS);
-    FastLED.show();
 
     olb_scanlineWord(OLB_LEDS,      OLB_FRAME_OPEN);
     olb_scanlineWord(OLB_LEDS,      OLB_FRAME_LUX);
     olb_scanlineWordFinal(OLB_LEDS, OLB_FRAME_BOX);
 
-    FastLED.setBrightness(OLB_INIT_BRIGHTNESS);
     unsigned int game = gameMenu();
     delay(500);
+
+    FastLED.setBrightness(OLB_GAME_BRIGHTNESS);
+    FastLED.clear();
+    FastLED.show();
+
     switch (game) {
         case 0:
             FourPong::run();
@@ -336,6 +340,9 @@ void loop() {
             break;
         case 5:
             Shining::run();
+            break;
+        case 6:
+            Snake::run();
             break;
     }
 }

@@ -1,7 +1,5 @@
 namespace Frog
 {
-    const unsigned int DEBOUNCE_MS = 30;
-
     const unsigned int ROW_GOAL = 0;
     const unsigned int ROW_WATER_TOP = 1;
     const unsigned int ROW_WATER_BOT = 5;
@@ -213,12 +211,7 @@ namespace Frog
     }
 
     void run() {
-      Serial.begin(115200);
       Serial.println("openLUXbox Frogger startet...");
-
-      FastLED.setBrightness(51);
-      FastLED.clear();
-      FastLED.show();
 
       gameStarted    = false;
       waitForRestart = false;
@@ -335,7 +328,7 @@ namespace Frog
     bool btnJustPressed(Button &b) {
       bool          current = (digitalRead(b.pin) == LOW);
       unsigned long now     = millis();
-      if (current && !b.lastState && (now - b.lastTime >= DEBOUNCE_MS)) {
+      if (current && !b.lastState && (now - b.lastTime >= OLB_DEBOUNCE_MS)) {
         b.lastState = true;
         b.lastTime  = now;
         return true;
