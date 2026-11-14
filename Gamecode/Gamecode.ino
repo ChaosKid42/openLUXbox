@@ -22,7 +22,7 @@
 #define OLB_INIT_FLICKER_MS      80      // ms pro Flacker-Frame
 #define OLB_INIT_FLICKER_COUNT   3       // Anzahl Flackerdurchläufe am Ende von "box"
 #define OLB_INIT_FADEOUT_MS      60      // ms pro Zeile beim Ausblenden
-#define OLB_INIT_NO_GAMES        7
+#define OLB_INIT_NO_GAMES        8
 
 CRGB OLB_LEDS[OLB_NUM_LEDS];
 
@@ -304,6 +304,7 @@ void setup() {
 #include "Nano_Hexagon/nano_hexagon.h"
 #include "Shining/shining.h"
 #include "Snake/snake.h"
+#include "CanoLbalt/canolbalt.h"
 
 void loop() {
     FastLED.setBrightness(OLB_INIT_BRIGHTNESS);
@@ -343,6 +344,9 @@ void loop() {
             break;
         case 6:
             Snake::run();
+            break;
+        case 7:
+            Canolbalt::run();
             break;
     }
 }
