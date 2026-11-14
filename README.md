@@ -1,14 +1,12 @@
 # openLUXbox
 ## DIY-Open-Source-Coop-**Spielekonsole**
-### Bauanleitung, 3D-Dateien, Dokumentation
 
 *openLUXbox ist eine offene DIY-Spielekonsole für unter 40€ – gebaut zum Spielen, gedacht zum Weitermachen.*
 
-Die openLUXbox wurde durch das *WLED Project* und das *Open LED Race Project* inspiriert. Die Grundidee besteht darin, eine einfache DIY-Hardware als Basis für **kooperative Spiele** zu nutzen. Die Steuerung erfolgt über vier integrierte Push-Buttons.
+### Fork der Software als Monolith.
 
-Die Hardware besteht aus einer LED-Matrix (WS2812b, 16x16 LEDs), einem ESP8266, 4 Buttons und wenigen Kleinteilen. Das Gehäuse ist 3D-gedruckt. Die Gesamtkosten bei ca. 30€.
+Die ist ein Fork der Originalsoftware von Jochen Wilke (https://github.com/Apologus/openLUXbox), der alle vorhandenen Spiele in ein einziges Arduino-Sketch
+zusammenführt. Nach dem Start der openLUXbox erscheint ein Auswahlmenü, mit Hilfe dessen
+man eines der acht Spiele auswählen kann. Auswahl mit links/rechts bzw. gelb/grün. Start mit unten bzw. weiß.
 
-Sämtliche Dokumente (Bauanleitung, Dokumentation, 3D-Druckdateien, Anleitung zum Programmieren) stehen frei zur Verfügung.
-
-Die Zahl der Spiele wächst stetig. Diese können über einen Webflasher direkt aufgespielt werden. Das Besondere ist, dass diese Spiele per *Vibe Coding* entstanden sind. Das heißt, die Beschreibung der gewünschten Spielefunktion wurde durch KI in Arduino-Code umgesetzt. Dadurch sind nur rudimentäre Programmierkenntnisse notwendig, um **eigene Spiele** zu erstellen.
-
+Die Software fuktioniet sowohl mit einem ESP8266 als auch mit einem ESP32.
