@@ -1,2 +1,0 @@
-Nano Hexagon
-Weicht den roten Balken aus! Ein kooperativer Klon von Hexagon.
